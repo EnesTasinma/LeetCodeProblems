@@ -1,0 +1,34 @@
+// Ana fonksiyon
+function LONGEST_COMMON_PREFIX(S[1..n]):
+    if n == 0:
+        return ""              // boş dizi durumu
+    return LCP_RECUR(S, 1, n)
+
+
+
+// Divide & Conquer
+function LCP_RECUR(S[1..n], low, high):
+
+    // Taban durum: aralıkta tek string varsa
+    if low == high:
+        return S[low]
+
+    mid ← ⌊(low + high) / 2⌋
+
+    leftPrefix  ← LCP_RECUR(S, low,     mid)
+    rightPrefix ← LCP_RECUR(S, mid + 1, high)
+
+    return COMMON_PREFIX(leftPrefix, rightPrefix)
+
+
+
+// İki string'in ortak başlangıcını bul
+function COMMON_PREFIX(a, b):
+    i ← 1
+    maxLen ← min(LENGTH(a), LENGTH(b))
+
+    while i ≤ maxLen and a[i] = b[i]:
+        i ← i + 1
+
+    // a[1..i-1] substring'ini döndür
+    return a[1 .. i-1]

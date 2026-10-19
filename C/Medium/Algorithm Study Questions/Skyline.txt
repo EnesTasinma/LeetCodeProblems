@@ -1,0 +1,71 @@
+Skyline(buildings[1..n]):
+    return SkylineRec(buildings, 1, n)
+
+
+SkylineRec(buildings, low, high):
+    if low > high:
+        return empty list
+
+    if low == high:           // tek bina
+        L = buildings[low].left
+        R = buildings[low].right
+        H = buildings[low].height
+        return [(L, H), (R, 0)]
+
+    mid = ⌊(low + high) / 2⌋
+
+    leftSky  = SkylineRec(buildings, low, mid)
+    rightSky = SkylineRec(buildings, mid + 1, high)
+
+    return MergeSkylines(leftSky, rightSky)
+
+
+MergeSkylines(S1, S2):
+    i ← 1, j ← 1
+    h1 ← 0, h2 ← 0          // iki tarafın aktif yükseklikleri
+    currH ← 0               // şu anki skyline yüksekliği
+    result ← empty list
+
+    while i ≤ |S1| and j ≤ |S2|:
+        if S1[i].x < S2[j].x:
+            x ← S1[i].x
+            h1 ← S1[i].h
+            i ← i + 1
+        else if S2[j].x < S1[i].x:
+            x ← S2[j].x
+            h2 ← S2[j].h
+            j ← j + 1
+        else:                       // aynı x koordinatı
+            x ← S1[i].x
+            h1 ← S1[i].h
+            h2 ← S2[j].h
+            i ← i + 1
+            j ← j + 1
+
+        maxH ← max(h1, h2)
+
+        if maxH ≠ currH:
+            append (x, maxH) to result
+            currH ← maxH
+
+    // S1'de kalan noktalar
+    while i ≤ |S1|:
+        x ← S1[i].x
+        h1 ← S1[i].h
+        maxH ← max(h1, h2)          // S2 tarafı artık 0
+        if maxH ≠ currH:
+            append (x, maxH) to result
+            currH ← maxH
+        i ← i + 1
+
+    // S2'de kalan noktalar
+    while j ≤ |S2|:
+        x ← S2[j].x
+        h2 ← S2[j].h
+        maxH ← max(h1, h2)
+        if maxH ≠ currH:
+            append (x, maxH) to result
+            currH ← maxH
+        j ← j + 1
+
+    return result

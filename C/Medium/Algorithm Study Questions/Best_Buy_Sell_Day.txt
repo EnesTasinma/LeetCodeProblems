@@ -1,0 +1,75 @@
+// Ana fonksiyon (divide & conquer)
+function MAX_PROFIT_DIVIDE_AND_CONQUER(P[1..n]):
+
+    if n <= 1:
+        return 0          // tek günde al-sat yok (kâr 0 kabul edelim)
+
+    // 1) Fark dizisini kur
+    for i from 1 to n-1:
+        D[i] ← P[i+1] - P[i]
+
+    // 2) D üzerinde maximum subarray kârını bul
+    best ← MAX_SUBARRAY_REC(D, 1, n-1)
+
+    return max(best, 0)   // kâr negatifse 0’a çekmek isteyebilirsin
+
+
+
+// Divide & Conquer maximum subarray
+function MAX_SUBARRAY_REC(A, left, right):
+
+    if left == right:
+        return A[left]
+
+    mid ← ⌊(left + right) / 2⌋
+
+    leftBest  ← MAX_SUBARRAY_REC(A, left,     mid)
+    rightBest ← MAX_SUBARRAY_REC(A, mid + 1, right)
+    crossBest ← MAX_CROSSING_SUBARRAY(A, left, mid, right)
+
+    return max(leftBest, rightBest, crossBest)
+
+
+
+// Ortayı kesen en iyi alt dizi
+function MAX_CROSSING_SUBARRAY(A, left, mid, right):
+
+    // soldan en iyi suffix
+    sum ← 0
+    bestLeft ← -∞
+    for i from mid down to left:
+        sum ← sum + A[i]
+        if sum > bestLeft:
+            bestLeft ← sum
+
+    // sağdan en iyi prefix
+    sum ← 0
+    bestRight ← -∞
+    for j from mid+1 to right:
+        sum ← sum + A[j]
+        if sum > bestRight:
+            bestRight ← sum
+
+    return bestLeft + bestRight
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+function MAX_PROFIT_LINEAR(P[1..n]):
+
+    if n <= 1:
+        return 0
+
+    minPrice   ← P[1]
+    bestProfit ← 0          // istersen −∞ ile başlayıp zorunlu al-sat da yapabilirsin
+
+    for i from 2 to n:
+        profitToday ← P[i] - minPrice
+        if profitToday > bestProfit:
+            bestProfit ← profitToday
+
+        if P[i] < minPrice:
+            minPrice ← P[i]
+
+    return bestProfit

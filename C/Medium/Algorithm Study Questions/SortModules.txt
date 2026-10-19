@@ -1,0 +1,49 @@
+Topological_Sort_DFS(G= (V,E))
+    for each v in V
+        mark[v] = unvisited
+
+    L <-- empty list
+
+    for each v in V     
+        if mark[v] == unvisited
+            DFS_visit(v, G, mark, L)
+
+    reverse(L)
+    return L 
+end Topological_Sort_DFS
+
+DFS_visit(u, G, MARK, L)
+    mark[u] <-- visited
+    for each (u,v) in E             //u'dan v'ye gideb her yol
+        if mark[v] == unvisited
+            DFS_visit(V, G, mark, L)    //Sıradaki her düğüm için bakıyor yani
+
+    append u to L 
+
+end DFS_visit
+
+
+Topological_Sort_Kahn's_Algorithm(G = (V,E))
+    for each v in V 
+        indegree[v] <---- 0     //Bütün düğümlere girenleri hesaplamak için bir tane array oluşturduk
+
+    for each edge (u,v) in E 
+        indegree[v] <--- indegree[v] + 1 //Bir Düğüme giren yol sayısını buluyoruz.
+
+    Q <-- Empty Queue
+
+    for each v in V 
+        if indegree[v] == 0 //Başlangıç düğümünü bulduk.
+            enqueue(Q,v)
+
+    L <-- Empty Queue
+
+    while Q not empty
+    u <-- deque
+    append u to L
+    for each (u,w) in E
+        indegree[w] <-- indegree[w] - 1
+        if indegree[w] == 0
+            enqueue(Q, w)
+
+    return L

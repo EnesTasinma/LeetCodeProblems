@@ -1,0 +1,38 @@
+function MAJORITY(A[1..n]):
+    return MAJORITY_REC(A, 1, n)
+
+
+
+function MAJORITY_REC(A, left, right):
+
+    // Base case: single element
+    if left == right:
+        return A[left]
+
+    mid ← ⌊(left + right) / 2⌋
+
+    // Divide
+    leftMajor  ← MAJORITY_REC(A, left, mid)
+    rightMajor ← MAJORITY_REC(A, mid + 1, right)
+
+    // Conquer
+    if leftMajor == rightMajor:
+        return leftMajor
+
+    // Otherwise count each candidate in entire range
+    countLeft  ← COUNT(A, left, right, leftMajor)
+    countRight ← COUNT(A, left, right, rightMajor)
+
+    if countLeft > countRight:
+        return leftMajor
+    else:
+        return rightMajor
+
+
+
+function COUNT(A, left, right, value):
+    count ← 0
+    for i from left to right:
+        if A[i] == value:
+            count ← count + 1
+    return count

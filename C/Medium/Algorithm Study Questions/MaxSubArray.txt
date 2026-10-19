@@ -1,0 +1,48 @@
+// Ana fonksiyon
+function MAX_SUBARRAY(A[1..n]):
+    return MAX_SUBARRAY_REC(A, 1, n)
+
+
+
+// Divide & Conquer
+function MAX_SUBARRAY_REC(A, left, right):
+
+    // Taban durum: tek eleman
+    if left == right:
+        return A[left]
+
+    mid ← ⌊(left + right) / 2⌋
+
+    // 1) En iyi alt dizi solda
+    bestLeft  ← MAX_SUBARRAY_REC(A, left, mid)
+
+    // 2) En iyi alt dizi sağda
+    bestRight ← MAX_SUBARRAY_REC(A, mid + 1, right)
+
+    // 3) Ortayı kesen en iyi alt dizi
+    bestCross ← MAX_CROSSING_SUBARRAY(A, left, mid, right)
+
+    return max(bestLeft, bestRight, bestCross)
+
+
+
+// Ortayı kesen en iyi alt dizi
+function MAX_CROSSING_SUBARRAY(A, left, mid, right):
+
+    // mid'den sola doğru en iyi toplam
+    sum ← 0
+    leftBest ← -∞
+    for i from mid down to left:
+        sum ← sum + A[i]
+        if sum > leftBest:
+            leftBest ← sum
+
+    // mid+1'den sağa doğru en iyi toplam
+    sum ← 0
+    rightBest ← -∞
+    for j from mid + 1 to right:
+        sum ← sum + A[j]
+        if sum > rightBest:
+            rightBest ← sum
+
+    return leftBest + rightBest

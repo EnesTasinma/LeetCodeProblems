@@ -1,0 +1,44 @@
+structure Node:
+    id     // oyuncu numarası (1..n)
+    next   // bir sonraki Node
+
+function FIND_WINNER_LINEAR(n):
+
+    // 1) Dairesel bağlı listeyi kur
+    head ← new Node(1)
+    prev ← head
+
+    for i from 2 to n:
+        node ← new Node(i)
+        prev.next ← node
+        prev ← node
+
+    prev.next ← head          // listeyi dairesel yap
+
+    // 2) El ele oyuncu eleme
+    current ← head
+
+    while current.next ≠ current:   // listede 1'den fazla oyuncu varken
+        victim ← current.next       // solundaki oyuncu
+
+        // victim'i listeden çıkar
+        current.next ← victim.next
+        // (istemiyorsan free etmezsin, pseudo-code için önemli değil)
+
+        // sıradaki oyuncuya geç
+        current ← current.next
+
+    // son kalan düğüm kazanan
+    return current.id
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+function JOSEPHUS(n):
+
+    if n == 1:
+        return 1
+
+    if n is even:
+        return 2 * JOSEPHUS(n / 2) - 1
+    else:                      // n is odd: n = 2m + 1
+        return 2 * JOSEPHUS(⌊n / 2⌋) + 1

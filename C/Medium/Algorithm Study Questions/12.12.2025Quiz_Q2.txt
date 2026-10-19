@@ -1,0 +1,54 @@
+function FIND_PEAKS(grid, n, m):
+    marked = array[n][m] initialized to false
+    DIVIDE(grid, 0, n-1, 0, m-1, marked)
+    return marked
+
+function DIVIDE(grid, top, bottom, left, right, marked):
+
+    # Base case: For very small subgrids brute-force check
+    if (bottom - top + 1) ≤ 2 AND (right - left + 1) ≤ 2:
+        CHECK_ALL(grid, top, bottom, left, right, marked)
+        return
+        
+
+    # Find mid-lines (partition the grid into 4 quadrants)
+    midRow = (top + bottom) / 2
+    midCol = (left + right) / 2
+
+    # 1) Recursively solve the 4 subgrids
+    DIVIDE(grid, top,      midRow,   left,      midCol,   marked)   # Q1
+    DIVIDE(grid, top,      midRow,   midCol+1,  right,    marked)   # Q2
+    DIVIDE(grid, midRow+1, bottom,    left,      midCol,   marked)   # Q3
+    DIVIDE(grid, midRow+1, bottom,   midCol+1,  right,    marked)   # Q4
+
+    # 2) Now check the boundary lines between subgrids
+    CHECK_BOUNDARIES(grid, top, bottom, left, right, midRow, midCol, marked)
+
+function IS_PEAK(grid, i, j):
+    if i > 0        AND grid[i][j] ≤ grid[i-1][j]: return false
+    if i < n-1      AND grid[i][j] ≤ grid[i+1][j]: return false
+    if j > 0        AND grid[i][j] ≤ grid[i][j-1]: return false
+    if j < m-1      AND grid[i][j] ≤ grid[i][j+1]: return false
+    return true
+
+function CHECK_BOUNDARIES(grid, top, bottom, left, right, midRow, midCol, marked):
+
+    # Horizontal boundary line between Q1-Q3 and Q2-Q4
+    for col from left to right:
+        if IS_PEAK(grid, midRow, col):
+            marked[midRow][col] = true
+        if IS_PEAK(grid, midRow+1, col):
+            marked[midRow+1][col] = true
+
+    # Vertical boundary line between Q1-Q2 and Q3-Q4
+    for row from top to bottom:
+        if IS_PEAK(grid, row, midCol):
+            marked[row][midCol] = true
+        if IS_PEAK(grid, row, midCol+1):
+            marked[row][midCol+1] = true
+
+function CHECK_ALL(grid, top, bottom, left, right, marked):
+    for i from top to bottom:
+        for j from left to right:
+            if IS_PEAK(grid, i, j):
+                marked[i][j] = true

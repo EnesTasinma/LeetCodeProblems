@@ -1,0 +1,122 @@
+function TILE_BOARD(board, size, topRow, leftCol, missingRow, missingCol, tileIdRef):
+
+    # size: şu anki alt tahtanın boyutu (size x size)
+    # (topRow, leftCol): bu alt tahtanın sol-üst köşesi
+    # (missingRow, missingCol): bu alt tahtanın içindeki bloklu hücrenin koordinatı
+    # tileIdRef: global/aktarılabilir sayaç (her L'ye farklı id vermek için)
+
+    if size == 2:
+        # 2x2 base case: 1 bloklu hücre var, diğer 3 hücreyi 1 L ile doldur
+        tileIdRef := tileIdRef + 1
+        id := tileIdRef
+
+        for i from 0 to 1:
+            for j from 0 to 1:
+                r := topRow + i
+                c := leftCol + j
+                if r != missingRow OR c != missingCol:
+                    board[r][c] := id
+        return
+
+    # 1) Orta noktayı bul
+    half := size / 2
+
+    midRow := topRow + half
+    midCol := leftCol + half
+
+    # Orta 4 kare (cross merkezindeki kareler):
+
+    # Q1 merkezi: (midRow - 1, midCol - 1)
+    # Q2 merkezi: (midRow - 1, midCol)
+    # Q3 merkezi: (midRow,     midCol - 1)
+    # Q4 merkezi: (midRow,     midCol)
+
+    # 2) Hangi quadrant'ta gerçek missing var, onu bul
+    # Quadrant'lar:
+    # Q1: top-left    -> rows [topRow .. midRow-1],    cols [leftCol .. midCol-1]
+    # Q2: top-right   -> rows [topRow .. midRow-1],    cols [midCol   .. leftCol+size-1]
+    # Q3: bottom-left -> rows [midRow .. topRow+size-1], cols [leftCol .. midCol-1]
+    # Q4: bottom-right-> rows [midRow .. topRow+size-1], cols [midCol   .. leftCol+size-1]
+
+    # flags: hangi quadrant'ta zaten missing var
+    missingInQ1 := (missingRow <  midRow) AND (missingCol <  midCol)
+    missingInQ2 := (missingRow <  midRow) AND (missingCol >= midCol)
+    missingInQ3 := (missingRow >= midRow) AND (missingCol <  midCol)
+    missingInQ4 := (missingRow >= midRow) AND (missingCol >= midCol)
+
+    # 3) Merkeze L-tromino yerleştir (diğer 3 quadrant için "yeni" missing hücre oluştur)
+    tileIdRef := tileIdRef + 1
+    centerId := tileIdRef
+
+    # Q1 merkezi
+    if NOT missingInQ1:
+        board[midRow - 1][midCol - 1] := centerId
+        newMissingQ1Row := midRow - 1
+        newMissingQ1Col := midCol - 1
+    else:
+        newMissingQ1Row := missingRow
+        newMissingQ1Col := missingCol
+
+    # Q2 merkezi
+    if NOT missingInQ2:
+        board[midRow - 1][midCol] := centerId
+        newMissingQ2Row := midRow - 1
+        newMissingQ2Col := midCol
+    else:
+        newMissingQ2Row := missingRow
+        newMissingQ2Col := missingCol
+
+    # Q3 merkezi
+    if NOT missingInQ3:
+        board[midRow][midCol - 1] := centerId
+        newMissingQ3Row := midRow
+        newMissingQ3Col := midCol - 1
+    else:
+        newMissingQ3Row := missingRow
+        newMissingQ3Col := missingCol
+
+    # Q4 merkezi
+    if NOT missingInQ4:
+        board[midRow][midCol] := centerId
+        newMissingQ4Row := midRow
+        newMissingQ4Col := midCol
+    else:
+        newMissingQ4Row := missingRow
+        newMissingQ4Col := missingCol
+
+    # 4) Dört alt tahta için rekürsif çağrı
+
+    # Q1: top-left
+    TILE_BOARD(board, half,
+               topRow, leftCol,
+               newMissingQ1Row, newMissingQ1Col,
+               tileIdRef)
+
+    # Q2: top-right
+    TILE_BOARD(board, half,
+               topRow, midCol,
+               newMissingQ2Row, newMissingQ2Col,
+               tileIdRef)
+
+    # Q3: bottom-left
+    TILE_BOARD(board, half,
+               midRow, leftCol,
+               newMissingQ3Row, newMissingQ3Col,
+               tileIdRef)
+
+    # Q4: bottom-right
+    TILE_BOARD(board, half,
+               midRow, midCol,
+               newMissingQ4Row, newMissingQ4Col,
+               tileIdRef)
+
+
+
+function TROMINO_TILING(n, missingRow, missingCol):
+
+    create board[n][n] filled with 0   # 0 = boş
+    tileIdRef := 0
+
+    TILE_BOARD(board, n, 0, 0, missingRow, missingCol, tileIdRef)
+
+    return board
